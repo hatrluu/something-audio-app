@@ -1,10 +1,14 @@
-import { exec } from 'child_process';
+import StreamPot from '@streampot/client';
 import { unlink, writeFile } from 'fs/promises';
 import { NextResponse } from 'next/server';
 import path from 'path';
-import { promisify } from 'util';
+// import { exec } from 'child_process';
+// import { promisify } from 'util';
 
-const execAsync = promisify(exec);
+// const execAsync = promisify(exec);
+const streampot = new StreamPot({
+    secret: process.env.streampot_api // replace with your own key from the API Tokens section
+})
 
 export async function POST(req) {
     try {
@@ -33,10 +37,19 @@ export async function POST(req) {
 
         console.log('Use FFmpeg to trim the audio');
         // Use FFmpeg to trim the audio
+        console.log(inputPath);
+        console.log(outputPath);
         const duration = endTime - startTime;
-        await execAsync(
-            `ffmpeg -i "${inputPath}" -ss ${startTime} -t ${duration} -acodec copy "${outputPath}"`
-        );
+        await streampot
+        .input(inputPath)
+        .setStartTime(startTime)
+        .setDuration(duration)
+        .output(outputPath)
+        .runAndWait()
+
+        // await execAsync(
+        //     `ffmpeg -i "${inputPath}" -ss ${startTime} -t ${duration} -acodec copy "${outputPath}"`
+        // );
 
         console.log('Read the trimmed file');
         // Read the trimmed file
