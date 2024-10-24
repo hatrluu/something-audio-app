@@ -1,5 +1,5 @@
 import StreamPot from '@streampot/client';
-import { unlink, writeFile } from 'fs/promises';
+import { unlink, writeFile, readFile } from 'fs/promises';
 import { NextResponse } from 'next/server';
 import path from 'path';
 // import { exec } from 'child_process';
