@@ -1,5 +1,6 @@
 import { Loader2, PauseCircle, PlayCircle, Upload, Volume2, VolumeX, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Waveform from './wavesurfer';
 
 const UnifiedInputDropzone = () => {
     const [text, setText] = useState('');
@@ -155,6 +156,7 @@ const UnifiedInputDropzone = () => {
         try {
             const formData = new FormData();
             formData.append('audio', file);
+            console.log(file);
             formData.append('startTime', startTime.toString());
             formData.append('endTime', endTime.toString());
 
@@ -191,6 +193,7 @@ const UnifiedInputDropzone = () => {
             audioRef.current.currentTime = time;
         }
     };
+
     useEffect(() => {
         return () => {
             if (audioUrl) URL.revokeObjectURL(audioUrl);
@@ -270,10 +273,15 @@ const UnifiedInputDropzone = () => {
                     </div>
                 )}
             </div>
-
-            {/* Audio Player and Trim Controls */}
             {file && audioUrl && (
+                <div className="space-y-4 p-4 mt-2 mb-2 border rounded-lg">
+                    <Waveform audio={audioUrl}></Waveform>
+                </div>
+            )}
+            {/* Audio Player and Trim Controls */}
+            { false && file && audioUrl && (
                 <div className="space-y-4 p-4 border rounded-lg">
+                    <h3>Legacy control</h3>
                     <audio
                         ref={audioRef}
                         src={audioUrl}

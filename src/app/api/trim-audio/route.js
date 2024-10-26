@@ -1,15 +1,11 @@
-import StreamPot from '@streampot/client';
-import { unlink, writeFile, readFile } from 'fs/promises';
+// import StreamPot from '@streampot/client';
+import { exec } from 'child_process';
+import { readFile, unlink, writeFile } from 'fs/promises';
 import { NextResponse } from 'next/server';
 import path from 'path';
-// import { exec } from 'child_process';
-// import { promisify } from 'util';
+import { promisify } from 'util';
 
-// const execAsync = promisify(exec);
-const streampot = new StreamPot({
-    secret: process.env.streampot_api // replace with your own key from the API Tokens section
-})
-
+const execAsync = promisify(exec);
 export async function POST(req) {
     try {
         const formData = await req.formData();
@@ -28,6 +24,7 @@ export async function POST(req) {
         // Create temporary file paths
         const inputPath = path.join('/tmp', `input-${Date.now()}.mp3`);
         const outputPath = path.join('/tmp', `output-${Date.now()}.mp3`);
+        // const outputName = `output-${Date.now()}.mp3`;
 
         console.log('Write uploaded file to disk');
         // Write uploaded file to disk
@@ -35,21 +32,24 @@ export async function POST(req) {
         console.log(inputPath);
         await writeFile(inputPath, buffer);
 
+        // const streampot = new StreamPot({
+        //     secret: process.env.streampot_api
+        // })
+        
         console.log('Use FFmpeg to trim the audio');
         // Use FFmpeg to trim the audio
-        console.log(inputPath);
-        console.log(outputPath);
         const duration = endTime - startTime;
-        await streampot
-        .input(inputPath)
-        .setStartTime(startTime)
-        .setDuration(duration)
-        .output(outputPath)
-        .runAndWait()
+        // const clip = await streampot
+        // .input(inputPath)
+        // .setStartTime(startTime)
+        // .setDuration(endTime)
+        // .output(outputName)
+        // .runAndWait()
 
-        // await execAsync(
-        //     `ffmpeg -i "${inputPath}" -ss ${startTime} -t ${duration} -acodec copy "${outputPath}"`
-        // );
+        // console.log(clip.outputs[outputName])
+        await execAsync(
+            `ffmpeg -i "${inputPath}" -ss ${startTime} -t ${duration} -acodec copy "${outputPath}"`
+        );
 
         console.log('Read the trimmed file');
         // Read the trimmed file
